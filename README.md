@@ -10,6 +10,16 @@ The file is encrypted in your browser before it is sent to the service.
 > application source, database schema, migrations, and deployment configuration
 > described below are not included, so this checkout cannot be deployed as-is.
 
+## Contents
+
+- [Features](#features)
+- [How it works](#how-it-works)
+- [Who it's for](#who-its-for)
+- [Security model](#security-model)
+- [Limitations](#limitations)
+- [Deployment notes](#deployment-notes)
+- [Repository contents](#repository-contents)
+
 ## Features
 
 - **Set the check-in cadence to anything, not just whole days.** The setup
@@ -32,6 +42,19 @@ The file is encrypted in your browser before it is sent to the service.
 - **A no-install page for the recipient to open the file:** `/decrypt`.
   They upload the file they received, type the passphrase, and it decrypts
   and downloads in their browser. No PGP tools, no command line.
+
+## How it works
+
+1. **Create a switch.** Choose a check-in interval, grace period, encryption
+   mode, and recipient. Save the separate check-in and cancel links.
+2. **Check in on schedule.** Each check-in resets the timer for the next one.
+3. **Respond to a warning.** If a check-in is missed, the service sends a
+   warning and starts the configured grace period.
+4. **Release or cancel.** The warning email includes a password-protected
+   cancel link. If the switch remains armed after the grace period, the
+   encrypted file is emailed to the recipient.
+5. **Open the file.** The recipient decrypts the attachment with the
+   passphrase in passphrase mode, or with their private key in PGP mode.
 
 ## Who it's for
 
