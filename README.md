@@ -1,9 +1,16 @@
-# Switch — a dead man's switch for encrypted files
+# Switch
 
-If you stop checking in, a file gets emailed to someone you choose. Everything
-is locked in the browser before it's ever saved anywhere.
+### A dead man's switch for encrypted files
 
-## What's new in this version
+If you stop checking in, Switch emails an encrypted file to someone you choose.
+The file is encrypted in your browser before it is sent to the service.
+
+> [!IMPORTANT]
+> This repository currently contains documentation and a license only. The
+> application source, database schema, migrations, and deployment configuration
+> described below are not included, so this checkout cannot be deployed as-is.
+
+## Features
 
 - **Set the check-in cadence to anything, not just whole days.** The setup
   page now has one-click presets &mdash; every hour, every 6 hours, every day,
@@ -26,26 +33,21 @@ is locked in the browser before it's ever saved anywhere.
   They upload the file they received, type the passphrase, and it decrypts
   and downloads in their browser. No PGP tools, no command line.
 
-## Important: two different kinds of "non-technical"
+## Who it's for
 
-**Deploying this app is still a technical, one-time task** — creating a
+**Deploying the app is still a technical, one-time task** — creating a
 Vercel project, a database, an email-sending account, and setting
 environment variables. That part genuinely needs someone comfortable with
 those tools; there's no way around it for a real, independently-running
 backend (see the earlier explanation of why a browser-only tool can't do
 this reliably).
 
-**Once it's deployed, using it is not technical at all.** Creating a
+**Once deployed, using it is not technical at all.** Creating a
 switch, checking in, cancelling, and opening a received file are all
 plain forms with plain-language instructions — built so a person who's
 never heard of encryption can do all of it correctly.
 
-If you don't have someone to do the one-time deployment, say so and I can
-either simplify further (e.g. point you to a hosted third-party dead-man's
-switch service instead) or walk you through the deployment step by step,
-slower.
-
-## How it protects you
+## Security model
 
 - **The server never has plaintext or a decryption key.** In passphrase
   mode, the passphrase never touches the server — only the resulting
@@ -58,7 +60,7 @@ slower.
   check-in link — so it can't be turned off just because someone found
   the check-in link.
 
-## What this does *not* solve
+## Limitations
 
 - **True sender anonymity.** Your Vercel account, domain, and Resend
   account are tied to billing information that can be subpoenaed. This
@@ -73,7 +75,12 @@ slower.
   is recoverable — that's what makes them real security, not just a
   formality.
 
-## Deploy it
+## Deployment notes
+
+These notes describe the intended setup, but cannot be followed from this
+checkout until the application and configuration files are added. In
+particular, the referenced `schema.sql`, migrations, `.env.example`, and
+`vercel.json` are not present here.
 
 1. **Create a Vercel project** from this folder.
 2. **Add Vercel Postgres** (Storage tab → Create Database → Postgres).
@@ -97,8 +104,8 @@ slower.
    - `CRON_SECRET` — another random string, same command
 6. **Protect the cron route.** Project Settings → Cron Jobs → enable
    "Secure your Cron Jobs" → set it to the same value as `CRON_SECRET`.
-7. **About the cron schedule.** `vercel.json` runs `/api/cron` hourly
-   (`0 * * * *`), which is what lets an "every hour" switch actually get
+7. **About the cron schedule.** The deployment notes describe `/api/cron`
+  running hourly (`0 * * * *`), which is what lets an "every hour" switch get
    checked hourly. **Vercel's free Hobby plan only runs cron jobs once a
    day**, no matter what schedule you put in `vercel.json` — on Hobby, an
    hourly or every-6-hours switch will only ever be checked once a day, so
@@ -127,23 +134,7 @@ slower.
     fail) and the right one (should permanently stop it). Reset your test
     row after — or just create a fresh switch with your real cadence.
 
-## Files
+## Repository contents
 
-```
-schema.sql / migrate_v2.sql / migrate_v3.sql   Database setup (fresh install / upgrades)
-lib/db.js                      Postgres client
-lib/hash.js                     Password hashing for the cancel password
-lib/time.js                      Interval/grace presets + minute<->unit conversion
-lib/encrypt.js                   Browser-side PGP encryption (advanced mode)
-lib/passphrase-crypto.js          Browser-side passphrase encryption (default mode)
-app/page.jsx                       Landing page
-app/setup/page.jsx                  Create-a-switch form
-app/checkin/page.jsx                 Check-in confirmation page
-app/cancel/page.jsx                   Password-protected permanent cancel
-app/decrypt/page.jsx                   Recipient's no-install unlock page
-app/api/setup/route.js                  Creates a switch row
-app/api/checkin/route.js                 Resets the timer
-app/api/cancel/route.js                   Verifies password, disarms the switch
-app/api/cron/route.js                      Runs daily: warns, then releases
-vercel.json                                 Cron schedule (12:00 UTC daily)
-```
+- `README.md` — project overview and deployment notes
+- `LICENSE` — MIT License
