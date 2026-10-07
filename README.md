@@ -14,6 +14,7 @@ The file is encrypted in your browser before it is sent to the service.
 
 - [Features](#features)
 - [How it works](#how-it-works)
+- [Before you rely on it](#before-you-rely-on-it)
 - [Who it's for](#who-its-for)
 - [Security model](#security-model)
 - [Limitations](#limitations)
@@ -55,6 +56,17 @@ The file is encrypted in your browser before it is sent to the service.
    encrypted file is emailed to the recipient.
 5. **Open the file.** The recipient decrypts the attachment with the
    passphrase in passphrase mode, or with their private key in PGP mode.
+
+## Before you rely on it
+
+- Save the check-in and cancel links somewhere durable. Keep the cancel
+  password separate from the check-in link; lost passwords cannot be recovered.
+- Make sure the recipient knows how to decrypt the file. In passphrase mode,
+  share the passphrase through a channel other than the email carrying the file.
+- Test the warning, cancellation, release, and decryption flow with a
+  non-sensitive file before trusting a switch with important data.
+- Check that your hosting plan runs the cron job often enough for the interval
+  you choose; the deployment notes below describe the Hobby-plan limitation.
 
 ## Who it's for
 
