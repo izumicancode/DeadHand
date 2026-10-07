@@ -18,6 +18,7 @@ The file is encrypted in your browser before it is sent to the service.
 - [Who it's for](#who-its-for)
 - [Security model](#security-model)
 - [Limitations](#limitations)
+- [Cron scheduling](#cron-scheduling)
 - [Deployment notes](#deployment-notes)
 - [Repository contents](#repository-contents)
 
@@ -110,6 +111,22 @@ never heard of encryption can do all of it correctly.
   is recoverable — that's what makes them real security, not just a
   formality.
 
+## Cron scheduling
+
+The deployment notes describe an hourly `/api/cron` schedule (`0 * * * *`).
+How often it actually runs depends on the hosting plan:
+
+| Hosting option | Cron behavior | Practical guidance |
+| --- | --- | --- |
+| Vercel Hobby | Runs once per day at most, regardless of the configured schedule. | Use daily-or-longer intervals; shorter intervals may be delayed by up to a day. |
+| Hobby with an external pinger | A pinger can call the protected route hourly. | Supports shorter intervals, subject to the pinger running reliably. |
+| Vercel Pro | The configured hourly schedule runs as specified. | Suitable for hourly or longer intervals. |
+
+For an external pinger, configure an hourly `GET` request to
+`https://your-app.vercel.app/api/cron` with the header
+`Authorization: Bearer <your CRON_SECRET>`. The endpoint only acts on switches
+that are due, so an hourly request is safe even when no switch needs attention.
+
 ## Deployment notes
 
 These notes describe the intended setup, but cannot be followed from this
@@ -139,28 +156,12 @@ particular, the referenced `schema.sql`, migrations, `.env.example`, and
    - `CRON_SECRET` — another random string, same command
 6. **Protect the cron route.** Project Settings → Cron Jobs → enable
    "Secure your Cron Jobs" → set it to the same value as `CRON_SECRET`.
-7. **About the cron schedule.** The deployment notes describe `/api/cron`
-  running hourly (`0 * * * *`), which is what lets an "every hour" switch get
-   checked hourly. **Vercel's free Hobby plan only runs cron jobs once a
-   day**, no matter what schedule you put in `vercel.json` — on Hobby, an
-   hourly or every-6-hours switch will only ever be checked once a day, so
-   the release could be delayed by up to a day past its real deadline.
-   Two ways around that on Hobby:
-   - Use daily-or-longer intervals only (the safest, zero-extra-setup option), or
-   - Keep the short interval, and add a free external pinger (e.g.
-     [cron-job.org](https://cron-job.org)) that calls
-     `GET https://your-app.vercel.app/api/cron` every hour with header
-     `Authorization: Bearer <your CRON_SECRET>`. The endpoint is safe to
-     call as often as you like — it only ever acts on switches that are
-     actually due.
-   On a Vercel Pro plan, the hourly schedule in `vercel.json` just works
-   as-is.
-8. **Deploy.** `vercel --prod`.
-9. **Create your first switch** at `/setup`. Pick a check-in cadence from
+7. **Deploy.** `vercel --prod`.
+8. **Create your first switch** at `/setup`. Pick a check-in cadence from
    the presets (or use "Custom…" for something like every 10 minutes, just
    for testing) and save both links it gives you — the check-in link and
    the cancel link — somewhere durable.
-10. **Test before trusting it.** Use the "Custom…" option to set a tiny
+9. **Test before trusting it.** Use the "Custom…" option to set a tiny
     interval (e.g. 5 minutes) and a tiny grace period, backdate
     `last_checkin_at` in the DB if you don't want to wait, manually call
     `/api/cron` with the right `Authorization` header, confirm the warning
