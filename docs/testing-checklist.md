@@ -7,21 +7,16 @@ every applicable step passes.
 
 - [ ] Create a short-duration test switch and save both links securely.
 - [ ] Check in, then confirm the next deadline moves forward.
-- [ ] Miss a check-in and confirm the warning arrives before the grace period
-	ends.
+- [ ] Miss a check-in; confirm the warning arrives before grace ends.
 
 ## Cancellation and release
 
-- [ ] Try the cancel link with the wrong password and confirm the switch stays
-	armed.
-- [ ] Cancel with the correct password and confirm the switch does not release
-	the file.
-- [ ] Create a fresh test switch, leave it armed through the grace period, and
-	confirm the recipient receives the encrypted file.
+- [ ] Use the wrong cancel password; confirm the switch stays armed.
+- [ ] Use the correct password; confirm release is prevented.
+- [ ] Let a separate test switch expire; confirm the encrypted email arrives.
 
 ## Decryption
 
-- [ ] Open the received file with `/decrypt` in passphrase mode, or with the
-	recipient's private key in PGP mode.
+- [ ] Decrypt in `/decrypt` (passphrase) or with the recipient's PGP key.
 - [ ] Confirm the decrypted content matches the original test file.
 - [ ] Remove test switches and test files when testing is complete.
